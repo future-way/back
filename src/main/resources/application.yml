@@ -1,1 +1,31 @@
-spring.application.name=back
+spring:
+  application:
+    name: back
+
+server:
+  port: 18088
+  servlet:
+    context-path: /future
+
+logging:
+  config: classpath:log4j2.xml
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    # API ?? ?? ?? path > query > body > response
+    groups-order: desc
+    tags-sorter: alpha
+    operations-sorter: method
+    disable-swagger-default-url: true
+    display-request-duration: true
+
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+  paths-to-match: /**
+
+  api-docs:
+    path: /api-docs/json
+
+  cache:
+    disabled: true
