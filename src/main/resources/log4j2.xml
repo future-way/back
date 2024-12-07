@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Configuration status="DEBUG">
+    <Properties>
+        <Property name="logPath">./logs</Property>
+        <Property name="logPattern">[%-5level] %d{yyyy-MM-dd HH:mm:ss} [%t] %c{1} - %msg%n</Property>
+        <Property name="infoLog">future_info</Property>
+        <Property name="errorLog">future_error</Property>
+        <Property name="layoutPattern">%style{%d{UTF-8}}{black} %highlight{%-5level} [%style{%t}{bright,blue}]
+            %style{%C}{bright,yellow}: %msg%n%throwable
+        </Property>
+    </Properties>
+
+    <Appenders>
+        <Console name="consoleAppender" target="SYSTEM_OUT">
+            <PatternLayout pattern="${logPattern}"/>
+        </Console>
+
+        <RollingFile
+                name="infoAppender"
+                append="true"
+                fileName="${logPath}/${infoLog}.log"
+                filePattern="${logPath}/${infoLog}.%d{yyyy-MM-dd}.%i.log.gz">
+            <PatternLayout pattern="${logPattern}"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="5MB"/>
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+        </RollingFile>
+
+        <RollingFile
+                name="errorAppender"
+                append="true"
+                fileName="${logPath}/${errorLog}.log"
+                filePattern="${logPath}/${errorLog}.%d{yyyy-MM-dd}.%i.log.gz">
+            <PatternLayout pattern="${logPattern}"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="5MB"/>
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+        </RollingFile>
+
+        <DefaultRolloverStrategy>
+            <Delete basePath="${logPath}" maxDepth="1">
+                <IfFileName glob="${infoLog}.*.log"/>
+                <IfLastModified age="3d"/>
+            </Delete>
+
+            <Delete basePath="${logPath}" maxDepth="1">
+                <IfFileName glob="${errorLog}.*.log"/>
+                <IfLastModified age="7d"/>
+            </Delete>
+        </DefaultRolloverStrategy>
+    </Appenders>
+
+    <Loggers>
+        <Root level="OFF" additivity="false">
+            <AppenderRef ref="consoleAppender"/>
+            <AppenderRef ref="infoAppender"/>
+            <AppenderRef ref="errorAppender"/>
+        </Root>
+
+        <logger name="com.team.futureway" level="info" additivity="false">
+            <AppenderRef ref="consoleAppender"/>
+            <AppenderRef ref="infoAppender"/>
+            <AppenderRef ref="errorAppender"/>
+        </logger>
+
+        <logger name="org.springframework" level="info" additivity="false">
+            <AppenderRef ref="consoleAppender"/>
+            <AppenderRef ref="infoAppender"/>
+            <AppenderRef ref="errorAppender"/>
+        </logger>
+
+        <Logger name="jdbc.resultset" level="OFF" additivity="false">
+            <AppenderRef ref="consoleAppender"/>
+            <AppenderRef ref="infoAppender"/>
+            <AppenderRef ref="errorAppender"/>
+        </Logger>
+
+        <Logger name="jdbc.connection" level="OFF" additivity="false">
+            <AppenderRef ref="consoleAppender"/>
+            <AppenderRef ref="infoAppender"/>
+            <AppenderRef ref="errorAppender"/>
+        </Logger>
+    </Loggers>
+</Configuration>
