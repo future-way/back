@@ -11,9 +11,7 @@ logging:
   config: classpath:log4j2.xml
 
 springdoc:
-
   swagger-ui:
-
     path: /swagger-ui.html
     # API ?? ?? ?? path > query > body > response
     groups-order: desc
