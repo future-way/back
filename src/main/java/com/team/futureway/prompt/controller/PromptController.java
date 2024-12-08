@@ -1,10 +1,20 @@
 package com.team.futureway.prompt.controller;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.team.futureway.prompt.dto.QuestionDto;
+import com.team.futureway.prompt.service.GeminiService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/prompt")
 public class PromptController {
+
+  private final GeminiService geminiService;
+
+  @PostMapping("/question")
+  public String requestGeminiAPI(@RequestBody QuestionDto dto) {
+    return geminiService.callGeminiAPI(dto);
+  }
 
 }
