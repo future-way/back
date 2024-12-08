@@ -1,11 +1,24 @@
-spring:
-  application:
-    name: back
-
 server:
   port: 18088
   servlet:
     context-path: /future
+
+spring:
+  application:
+    name: back
+  datasource:
+    url: jdbc:mariadb://{IP}}:{PORT}/test_db
+    username: {ID}
+    password: {PASSWORD}
+    driver-class-name: org.mariadb.jdbc.Driver
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MariaDBDialect
+        show_sql: true
+        format_sql: true
+        use_sql_comments: true
+        ddl-auto: update
 
 logging:
   config: classpath:log4j2.xml
@@ -13,7 +26,7 @@ logging:
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
-    # API ?? ?? ?? path > query > body > response
+    # API 정렬 순서 path > query > body > response
     groups-order: desc
     tags-sorter: alpha
     operations-sorter: method
@@ -28,6 +41,7 @@ springdoc:
     disabled: true
 
 gemini:
+  model: gemini-1.5-flash
   api:
     url: https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=
     key: {PUT_GEMINI_KEY}
