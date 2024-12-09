@@ -20,8 +20,6 @@ spring:
         use_sql_comments: true
         ddl-auto: update
 
-logging:
-  config: classpath:log4j2.xml
 
 springdoc:
   swagger-ui:
