@@ -54,7 +54,7 @@
     </Appenders>
 
     <Loggers>
-        <Root level="OFF" additivity="false">
+        <Root level="info" additivity="false">
             <AppenderRef ref="consoleAppender"/>
             <AppenderRef ref="infoAppender"/>
             <AppenderRef ref="errorAppender"/>
@@ -78,7 +78,7 @@
             <AppenderRef ref="errorAppender"/>
         </Logger>
 
-        <Logger name="jdbc.connection" level="OFF" additivity="false">
+        <Logger name="jdbc.connection" level="info" additivity="false">
             <AppenderRef ref="consoleAppender"/>
             <AppenderRef ref="infoAppender"/>
             <AppenderRef ref="errorAppender"/>
