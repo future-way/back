@@ -15,7 +15,7 @@ public class GeminiController {
 
     private final GeminiService geminiService;
 
-    @GetMapping
+    @PostMapping
     public ResponseEntity<GeminiQuestionResponse> gemini(@RequestBody GeminiRequest request) {
         GeminiQuestionDTO result = geminiService.getQuestionMessage(request.userId());
         return ResponseEntity.ok(GeminiQuestionResponse.of(result));
