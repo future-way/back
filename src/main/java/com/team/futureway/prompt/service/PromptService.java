@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 @Service
-public class GeminiService {
+public class PromptService {
 
   @Value("${gemini.api.key}")
   private String GEMINI_KEY;
