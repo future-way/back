@@ -2,14 +2,19 @@ package com.team.futureway.gemini.service;
 
 import com.team.futureway.common.exception.CoreException;
 import com.team.futureway.common.exception.ErrorType;
+import com.team.futureway.gemini.dto.AiConsultationSummaryHistoryDTO;
 import com.team.futureway.gemini.dto.QuestionDTO;
 import com.team.futureway.gemini.entity.AiConsultationHistory;
+import com.team.futureway.gemini.entity.AiConsultationSummaryHistory;
 import com.team.futureway.gemini.repository.AiConsultationHistoryRepository;
+import com.team.futureway.gemini.repository.AiConsultationSummaryHistoryRepository;
 import com.team.futureway.user.entity.User;
 import com.team.futureway.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -18,6 +23,8 @@ public class QuestionService {
     private final UserRepository userRepository;
 
     private final AiConsultationHistoryRepository aiConsultationHistoryRepository;
+
+    private final AiConsultationSummaryHistoryRepository aiConsultationSummaryHistoryRepository;
 
     private final GeminiService geminiService;
 
@@ -61,5 +68,17 @@ public class QuestionService {
         AiConsultationHistory result = aiConsultationHistoryRepository.save(newAiConsultationHistory);
 
         return QuestionDTO.of(result.getAiConsultationHistoryId(), result.getUserId(), result.getQuestionNumber(), result.getQuestionMessage(), result.getAnswer());
+    }
+
+    public AiConsultationSummaryHistoryDTO getSummary(Long userId) {
+        List<AiConsultationHistory> aiConsultationHistoryList = aiConsultationHistoryRepository.findByUserId(userId);
+
+        // gemini 에게 내용 전달후 상담 결과 요약 받기
+        String summary = geminiService.getSummary(aiConsultationHistoryList);
+
+        AiConsultationSummaryHistory aiConsultationSummaryHistory = AiConsultationSummaryHistory.of(null, userId, summary);
+        AiConsultationSummaryHistory result = aiConsultationSummaryHistoryRepository.save(aiConsultationSummaryHistory);
+
+        return AiConsultationSummaryHistoryDTO.of(result.getUserId(), result.getSummary(), result.getCreatedDate());
     }
 }

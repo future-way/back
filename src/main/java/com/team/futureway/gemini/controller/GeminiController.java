@@ -1,9 +1,8 @@
 package com.team.futureway.gemini.controller;
 
+import com.team.futureway.gemini.dto.AiConsultationSummaryHistoryDTO;
 import com.team.futureway.gemini.dto.QuestionDTO;
-import com.team.futureway.gemini.response.AnswerRequest;
-import com.team.futureway.gemini.response.GeminiQuestionResponse;
-import com.team.futureway.gemini.response.QuestionRequest;
+import com.team.futureway.gemini.response.*;
 import com.team.futureway.gemini.service.QuestionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -36,4 +35,9 @@ public class GeminiController {
         return ResponseEntity.ok(GeminiQuestionResponse.of(result));
     }
 
+    @PostMapping("/summary")
+    public ResponseEntity<SummaryResponse> summary(@RequestBody SummaryRequest request) {
+        AiConsultationSummaryHistoryDTO result = questionService.getSummary(request.userId());
+        return ResponseEntity.ok(SummaryResponse.of(result));
+    }
 }
