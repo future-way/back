@@ -10,7 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 @Getter
 @Slf4j
-public class GeminiQuestionDTO {
+public class QuestionDTO {
 
     private Long aiConsultationHistoryId; // AI 상담 기록 ID
     private Long userId; // 사용자 ID
@@ -18,13 +18,13 @@ public class GeminiQuestionDTO {
     private String questionMessage; // 질문 메시지
     private String answer; // 답변
 
-    public static GeminiQuestionDTO of(
+    public static QuestionDTO of(
             Long aiConsultationHistoryId
             , Long userId
             , int questionNumber
             , String questionMessage
             , String answer) {
-        return new GeminiQuestionDTO(
+        return new QuestionDTO(
                 aiConsultationHistoryId
                 , userId
                 , questionNumber

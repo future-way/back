@@ -34,9 +34,11 @@ public class AiConsultationHistory {
         return new AiConsultationHistory(aiConsultationHistoryId, userId, questionNumber, questionMessage, answer);
     }
 
-    // 질문 번호 증가 로직
     public void incrementQuestionNumber() {
         this.questionNumber++;
     }
 
+    public void setAnswer(String answer) {
+        this.answer = answer;
+    }
 }

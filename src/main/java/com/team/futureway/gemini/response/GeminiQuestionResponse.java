@@ -1,10 +1,10 @@
 package com.team.futureway.gemini.response;
 
-import com.team.futureway.gemini.dto.GeminiQuestionDTO;
+import com.team.futureway.gemini.dto.QuestionDTO;
 
-public record GeminiQuestionResponse(Long aiConsultationHistoryId,Long userId, int questionNumber, String questionMessage, String answer) {
+public record GeminiQuestionResponse(Long aiConsultationHistoryId, Long userId, int questionNumber, String questionMessage, String answer) {
 
-    public static GeminiQuestionResponse of(GeminiQuestionDTO dto) {
+    public static GeminiQuestionResponse of(QuestionDTO dto) {
         return new GeminiQuestionResponse(
                 dto.getAiConsultationHistoryId()
                 , dto.getUserId()
