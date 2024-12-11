@@ -28,8 +28,4 @@ public class ConsultService {
         result.getConsultAt());
   }
 
-  public List<Consult> getConsultAll(){
-    return consultRepository.findAll();
-  }
-
 }
