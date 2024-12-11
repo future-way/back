@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 
@@ -29,8 +28,14 @@ public class Consult {
   @Column(name = "kind", length = 10)
   private String kind;
 
+  @Column(name = "interest", length = 5)
+  private String interest;
+
   @Column(name = "consult_at")
-  @CreatedDate
   private LocalDateTime consultAt;
+
+  public static Consult of(Long consultId, Long userId, String title, String kind, String interest, LocalDateTime consultAt) {
+    return new Consult(consultId, userId, title, kind, interest, consultAt);
+  }
 
 }
