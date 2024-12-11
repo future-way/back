@@ -2,7 +2,6 @@ package com.team.futureway.gemini.service;
 
 import com.team.futureway.common.exception.CoreException;
 import com.team.futureway.common.exception.ErrorType;
-import com.team.futureway.gemini.dto.AnswerDTO;
 import com.team.futureway.gemini.dto.QuestionDTO;
 import com.team.futureway.gemini.entity.AiConsultationHistory;
 import com.team.futureway.gemini.repository.AiConsultationHistoryRepository;
@@ -50,7 +49,7 @@ public class QuestionService {
         aiConsultationHistoryRepository.save(aiConsultationHistory);
 
         // 새로운 질문 생성 > gemini
-        String newQuestionMessage ="새로운 질문";
+        String newQuestionMessage = geminiService.getNewQuestion(aiConsultationHistory.getQuestionMessage(), questionDTO.getAnswer());
 
         AiConsultationHistory newAiConsultationHistory = AiConsultationHistory.of(null
                 , questionDTO.getUserId()
