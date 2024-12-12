@@ -2,13 +2,10 @@ package com.team.futureway.gemini.controller;
 
 import com.team.futureway.gemini.dto.AiConsultationSummaryHistoryDTO;
 import com.team.futureway.gemini.dto.QuestionDTO;
+import com.team.futureway.gemini.dto.UserTypeDTO;
 import com.team.futureway.gemini.response.*;
 import com.team.futureway.gemini.service.QuestionService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -48,5 +45,19 @@ public class GeminiController {
     public ResponseEntity<SummaryResponse> summary(@RequestBody SummaryRequest request) {
         AiConsultationSummaryHistoryDTO result = questionService.getSummary(request.userId());
         return ResponseEntity.ok(SummaryResponse.of(result));
+    }
+
+    @Operation(summary = "사용자 유형 저장")
+    @PostMapping("/type")
+    public ResponseEntity<UserTypeResponse> type(@RequestBody UserTypeRequest request) {
+        UserTypeDTO userTypeDTO = UserTypeDTO.of(
+                request.userId(),
+                request.question(),
+                request.selectType(),
+                request.answer(),
+                request.userType()
+        );
+        UserTypeDTO result = questionService.saveUserType(userTypeDTO);
+        return ResponseEntity.ok(UserTypeResponse.of(result));
     }
 }
