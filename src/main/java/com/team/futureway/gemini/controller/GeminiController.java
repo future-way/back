@@ -32,7 +32,7 @@ public class GeminiController {
         QuestionDTO questionDTO = QuestionDTO.of(
                 request.aiConsultationHistoryId(),
                 request.userId(),
-                request.questionNumber(),
+                0,
                 null,
                 request.answer(),
                 null
