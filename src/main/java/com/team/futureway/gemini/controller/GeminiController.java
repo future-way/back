@@ -4,10 +4,17 @@ import com.team.futureway.gemini.dto.AiConsultationSummaryHistoryDTO;
 import com.team.futureway.gemini.dto.QuestionDTO;
 import com.team.futureway.gemini.response.*;
 import com.team.futureway.gemini.service.QuestionService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "Gemini", description = "Gemini API")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/gemini")
@@ -15,13 +22,14 @@ public class GeminiController {
 
     private final QuestionService questionService;
 
+    @Operation(summary = "사용자와 상담 시작 시")
     @PostMapping
     public ResponseEntity<GeminiQuestionResponse> questionMessage(@RequestBody QuestionRequest request) {
         QuestionDTO result = questionService.getQuestionMessage(request.userId());
         return ResponseEntity.ok(GeminiQuestionResponse.of(result));
     }
 
-
+    @Operation(summary = "상담 진행 API")
     @PostMapping("/answer")
     public ResponseEntity<GeminiQuestionResponse> newQuestionMessage(@RequestBody AnswerRequest request) {
         QuestionDTO questionDTO = QuestionDTO.of(
@@ -35,6 +43,7 @@ public class GeminiController {
         return ResponseEntity.ok(GeminiQuestionResponse.of(result));
     }
 
+    @Operation(summary = "상담 종료 시 (상담 내용 요약)")
     @PostMapping("/summary")
     public ResponseEntity<SummaryResponse> summary(@RequestBody SummaryRequest request) {
         AiConsultationSummaryHistoryDTO result = questionService.getSummary(request.userId());
