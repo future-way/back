@@ -2,7 +2,9 @@ package com.team.futureway.gemini.response;
 
 import com.team.futureway.gemini.dto.QuestionDTO;
 
-public record GeminiQuestionResponse(Long aiConsultationHistoryId, Long userId, int questionNumber, String questionMessage, String answer) {
+import java.util.List;
+
+public record GeminiQuestionResponse(Long aiConsultationHistoryId, Long userId, int questionNumber, String questionMessage, String answer, List<String> items) {
 
     public static GeminiQuestionResponse of(QuestionDTO dto) {
         return new GeminiQuestionResponse(
@@ -11,6 +13,7 @@ public record GeminiQuestionResponse(Long aiConsultationHistoryId, Long userId, 
                 , dto.getQuestionNumber()
                 , dto.getQuestionMessage()
                 , dto.getAnswer()
+                , dto.getItems()
         );
     }
 }

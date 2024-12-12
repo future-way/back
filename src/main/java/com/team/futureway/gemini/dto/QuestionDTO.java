@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.List;
+
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Getter
@@ -17,7 +19,7 @@ public class QuestionDTO {
     private int questionNumber; // 질문 번호
     private String questionMessage; // 질문 메시지
     private String answer; // 답변
-    private String[] items;
+    private List<String> items;
 
     public static QuestionDTO of(
             Long aiConsultationHistoryId
@@ -25,7 +27,7 @@ public class QuestionDTO {
             , int questionNumber
             , String questionMessage
             , String answer
-            , String[] items) {
+            , List<String> items) {
         return new QuestionDTO(
                 aiConsultationHistoryId
                 , userId
