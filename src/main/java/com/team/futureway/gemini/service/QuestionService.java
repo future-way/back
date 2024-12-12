@@ -18,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -39,7 +41,10 @@ public class QuestionService {
   public QuestionDTO getQuestionMessage(Long userId, String kind, String interest) {
   User user = userRepository.findById(userId).orElseThrow(() -> new CoreException(ErrorType.USER_NOT_FOUND, userId));
   String startMessage = promptUtil.getStartConsult(user.getName());
-  String questionMessage = geminiService.getNewQuestion(promptUtil.getPromptMultiPrefix());
+
+  String prompt = promptUtil.getPromptMultiPrefix();
+
+  String questionMessage = geminiService.getNewQuestion(prompt);
 
   int questionNumber = 1; // 첫 질문은 1로 고정..
   String storeQuestion = "홀랜드 적성 검사 기반 사용자 전공 및 사용자 진로 상담을 진행합니다.";
@@ -47,9 +52,9 @@ public class QuestionService {
   AiConsultationHistory aiConsultationHistory = AiConsultationHistory.of(null, userId, questionNumber, storeQuestion, null, kind, interest);
   AiConsultationHistory result = aiConsultationHistoryRepository.save(aiConsultationHistory);
 
-  String[] multiMessage = checkMultiMessage(questionMessage);
+  List<String> multiMessage = checkMultiMessage(questionMessage);
 
-  if (multiMessage.length > 1) {
+  if (multiMessage.size() > 1) {
     startMessage += "아래 선택지 중 하나를 선택해주세요!";
   } else {
     startMessage += "어떤 분야에 관심이 있나요?";
@@ -89,7 +94,7 @@ public class QuestionService {
     newAiConsultationHistory.incrementQuestionNumber();
     AiConsultationHistory result = aiConsultationHistoryRepository.save(newAiConsultationHistory);
 
-    String[] multiMessage = checkMultiMessage(newQuestionMessage);
+    List<String> multiMessage = checkMultiMessage(newQuestionMessage);
 
     return QuestionDTO.of(
         result.getAiConsultationHistoryId(),
@@ -112,10 +117,14 @@ public class QuestionService {
     return AiConsultationSummaryHistoryDTO.of(result.getUserId(), result.getSummary(), result.getCreatedDate());
   }
 
-  private String[] checkMultiMessage(String question) {
-    return question.contains("^")
-        ? question.split("^")
-        : new String[]{ question };
+  private List<String> checkMultiMessage(String question) {
+    List<String> multi = new ArrayList<>();
+
+    if (question.contains("^")) {
+      Collections.addAll(multi, question.split("^"));
+    }
+
+    return multi;
   }
         return AiConsultationSummaryHistoryDTO.of(result.getUserId(), result.getSummary(), result.getCreatedDate());
     }
