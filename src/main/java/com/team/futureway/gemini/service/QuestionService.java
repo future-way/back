@@ -4,10 +4,13 @@ import com.team.futureway.common.exception.CoreException;
 import com.team.futureway.common.exception.ErrorType;
 import com.team.futureway.gemini.dto.AiConsultationSummaryHistoryDTO;
 import com.team.futureway.gemini.dto.QuestionDTO;
+import com.team.futureway.gemini.dto.UserTypeDTO;
 import com.team.futureway.gemini.entity.AiConsultationHistory;
 import com.team.futureway.gemini.entity.AiConsultationSummaryHistory;
+import com.team.futureway.gemini.entity.UserType;
 import com.team.futureway.gemini.repository.AiConsultationHistoryRepository;
 import com.team.futureway.gemini.repository.AiConsultationSummaryHistoryRepository;
+import com.team.futureway.gemini.repository.UserTypeRepository;
 import com.team.futureway.gemini.util.PromptUtil;
 import com.team.futureway.user.entity.User;
 import com.team.futureway.user.repository.UserRepository;
@@ -33,38 +36,39 @@ public class QuestionService {
 
   private final GeminiService geminiService;
 
+  private final UserTypeRepository userTypeRepository;
 
   public QuestionDTO getQuestionMessage(Long userId, String kind, String interest) {
-  User user = userRepository.findById(userId).orElseThrow(() -> new CoreException(ErrorType.USER_NOT_FOUND, userId));
-  String startMessage = promptUtil.getStartConsult(user.getName());
+    User user = userRepository.findById(userId).orElseThrow(() -> new CoreException(ErrorType.USER_NOT_FOUND, userId));
+    String startMessage = promptUtil.getStartConsult(user.getName());
 
-  String prompt = promptUtil.getPromptMultiPrefix();
+    String prompt = promptUtil.getPromptMultiPrefix();
 
-  String questionMessage = geminiService.getNewQuestion(prompt);
+    String questionMessage = geminiService.getNewQuestion(prompt);
 
-  int questionNumber = 1; // 첫 질문은 1로 고정..
-  String storeQuestion = "홀랜드 적성 검사 기반 사용자 전공 및 사용자 진로 상담을 진행합니다.";
+    int questionNumber = 1; // 첫 질문은 1로 고정..
+    String storeQuestion = "홀랜드 적성 검사 기반 사용자 전공 및 사용자 진로 상담을 진행합니다.";
 
-  AiConsultationHistory aiConsultationHistory = AiConsultationHistory.of(null, userId, questionNumber, storeQuestion, null, kind, interest);
-  AiConsultationHistory result = aiConsultationHistoryRepository.save(aiConsultationHistory);
+    AiConsultationHistory aiConsultationHistory = AiConsultationHistory.of(null, userId, questionNumber, storeQuestion, null, kind, interest);
+    AiConsultationHistory result = aiConsultationHistoryRepository.save(aiConsultationHistory);
 
-  List<String> multiMessage = checkMultiMessage(questionMessage);
+    List<String> multiMessage = checkMultiMessage(questionMessage);
 
-  if (multiMessage.size() > 1) {
-    startMessage += "아래 선택지 중 하나를 선택해주세요!";
-  } else {
-    startMessage += "어떤 분야에 관심이 있나요?";
+    if (multiMessage.size() > 1) {
+      startMessage += "아래 선택지 중 하나를 선택해주세요!";
+    } else {
+      startMessage += "어떤 분야에 관심이 있나요?";
+    }
+
+    return QuestionDTO.of(
+        result.getAiConsultationHistoryId(),
+        result.getUserId(),
+        result.getQuestionNumber(),
+        startMessage,
+        result.getAnswer(),
+        multiMessage);
   }
-
-  return QuestionDTO.of(
-      result.getAiConsultationHistoryId(),
-      result.getUserId(),
-      result.getQuestionNumber(),
-      startMessage,
-      result.getAnswer(),
-      multiMessage);
-  }
-
+    
   @Transactional
   public QuestionDTO getNewQuestionMessage(QuestionDTO questionDTO) {
     AiConsultationHistory aiConsultationHistory = aiConsultationHistoryRepository.findById(questionDTO.getAiConsultationHistoryId())
@@ -122,4 +126,17 @@ public class QuestionService {
 
     return multi;
   }
+
+  public UserTypeDTO saveUserType(UserTypeDTO userTypeDTO) {
+    UserType userType = UserType.of(null
+            , userTypeDTO.getUserId()
+            , userTypeDTO.getQuestion()
+            , userTypeDTO.getSelectType()
+            , userTypeDTO.getAnswer()
+            , userTypeDTO.getUserType()
+    );
+    UserType result = userTypeRepository.save(userType);
+    return userTypeDTO.of(result.getUserId(),result.getQuestion(),result.getSelectType(),result.getAnswer(),result.getUserType());
+  }
+
 }
