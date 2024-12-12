@@ -25,7 +25,7 @@ public class GeminiController {
     @Operation(summary = "사용자와 상담 시작 시")
     @PostMapping
     public ResponseEntity<GeminiQuestionResponse> questionMessage(@RequestBody QuestionRequest request) {
-        QuestionDTO result = questionService.getQuestionMessage(request.userId());
+        QuestionDTO result = questionService.getQuestionMessage(request.userId(), request.kind(), request.interest());
         return ResponseEntity.ok(GeminiQuestionResponse.of(result));
     }
 
@@ -37,7 +37,8 @@ public class GeminiController {
                 request.userId(),
                 request.questionNumber(),
                 null,
-                request.answer()
+                request.answer(),
+                null
         );
         QuestionDTO result = questionService.getNewQuestionMessage(questionDTO);
         return ResponseEntity.ok(GeminiQuestionResponse.of(result));
