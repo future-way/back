@@ -4,10 +4,13 @@ import com.team.futureway.common.exception.CoreException;
 import com.team.futureway.common.exception.ErrorType;
 import com.team.futureway.gemini.dto.AiConsultationSummaryHistoryDTO;
 import com.team.futureway.gemini.dto.QuestionDTO;
+import com.team.futureway.gemini.dto.UserTypeDTO;
 import com.team.futureway.gemini.entity.AiConsultationHistory;
 import com.team.futureway.gemini.entity.AiConsultationSummaryHistory;
+import com.team.futureway.gemini.entity.UserType;
 import com.team.futureway.gemini.repository.AiConsultationHistoryRepository;
 import com.team.futureway.gemini.repository.AiConsultationSummaryHistoryRepository;
+import com.team.futureway.gemini.repository.UserTypeRepository;
 import com.team.futureway.user.entity.User;
 import com.team.futureway.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +31,7 @@ public class QuestionService {
 
     private final GeminiService geminiService;
 
+    private final UserTypeRepository userTypeRepository;
 
     public QuestionDTO getQuestionMessage(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new CoreException(ErrorType.USER_NOT_FOUND, userId));
@@ -38,7 +42,6 @@ public class QuestionService {
                         "^" + user.getName() + "님은 어떤 분야에 관심이 있으신가요?" +
                         "구체적으로 말해주실수록 더 좋아요! 산업, 직군, 세부 직업 이름 등 자세히 말씀해주세요.";
 
-        // String newQuestionMessage = geminiService.getNewQuestion("", "");
 
         int QuestionNumber = 1; // 첫 질문은 1로 고정..
 
@@ -82,5 +85,17 @@ public class QuestionService {
         AiConsultationSummaryHistory result = aiConsultationSummaryHistoryRepository.save(aiConsultationSummaryHistory);
 
         return AiConsultationSummaryHistoryDTO.of(result.getUserId(), result.getSummary(), result.getCreatedDate());
+    }
+
+    public UserTypeDTO saveUserType(UserTypeDTO userTypeDTO) {
+        UserType userType = UserType.of(null
+                , userTypeDTO.getUserId()
+                , userTypeDTO.getQuestion()
+                , userTypeDTO.getSelectType()
+                , userTypeDTO.getAnswer()
+                , userTypeDTO.getUserType()
+        );
+        UserType result = userTypeRepository.save(userType);
+        return userTypeDTO.of(result.getUserId(),result.getQuestion(),result.getSelectType(),result.getAnswer(),result.getUserType());
     }
 }
