@@ -126,18 +126,16 @@ public class QuestionService {
 
     return multi;
   }
-        return AiConsultationSummaryHistoryDTO.of(result.getUserId(), result.getSummary(), result.getCreatedDate());
-    }
 
-    public UserTypeDTO saveUserType(UserTypeDTO userTypeDTO) {
-        UserType userType = UserType.of(null
-                , userTypeDTO.getUserId()
-                , userTypeDTO.getQuestion()
-                , userTypeDTO.getSelectType()
-                , userTypeDTO.getAnswer()
-                , userTypeDTO.getUserType()
-        );
-        UserType result = userTypeRepository.save(userType);
-        return userTypeDTO.of(result.getUserId(),result.getQuestion(),result.getSelectType(),result.getAnswer(),result.getUserType());
-    }
+  public UserTypeDTO saveUserType(UserTypeDTO userTypeDTO) {
+    UserType userType = UserType.of(null
+            , userTypeDTO.getUserId()
+            , userTypeDTO.getQuestion()
+            , userTypeDTO.getSelectType()
+            , userTypeDTO.getAnswer()
+            , userTypeDTO.getUserType()
+    );
+    UserType result = userTypeRepository.save(userType);
+    return userTypeDTO.of(result.getUserId(),result.getQuestion(),result.getSelectType(),result.getAnswer(),result.getUserType());
+  }
 }
