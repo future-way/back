@@ -11,6 +11,7 @@ import com.team.futureway.gemini.entity.UserType;
 import com.team.futureway.gemini.repository.AiConsultationHistoryRepository;
 import com.team.futureway.gemini.repository.AiConsultationSummaryHistoryRepository;
 import com.team.futureway.gemini.repository.UserTypeRepository;
+import com.team.futureway.gemini.util.PromptUtil;
 import com.team.futureway.user.entity.User;
 import com.team.futureway.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,67 +24,99 @@ import java.util.List;
 @Service
 public class QuestionService {
 
-    private final UserRepository userRepository;
+  private final UserRepository userRepository;
 
-    private final AiConsultationHistoryRepository aiConsultationHistoryRepository;
+  private final AiConsultationHistoryRepository aiConsultationHistoryRepository;
 
-    private final AiConsultationSummaryHistoryRepository aiConsultationSummaryHistoryRepository;
+  private final AiConsultationSummaryHistoryRepository aiConsultationSummaryHistoryRepository;
 
-    private final GeminiService geminiService;
+  private final PromptUtil promptUtil;
 
-    private final UserTypeRepository userTypeRepository;
+  private final GeminiService geminiService;
 
-    public QuestionDTO getQuestionMessage(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new CoreException(ErrorType.USER_NOT_FOUND, userId));
-        String questionMessage =
-                "안녕하세요! 제 이름은 모모예요, 관심 분야는 있는데" +
-                        "정확히 어떤 일을 해야 할지 모르겠어서 혼란스러우신 거 같아요." +
-                        "제가 앞으로 몇가지 질문을 할 텐데 답변해주시면 원하는 진로를 찾을 수 있을거 같아요!" +
-                        "^" + user.getName() + "님은 어떤 분야에 관심이 있으신가요?" +
-                        "구체적으로 말해주실수록 더 좋아요! 산업, 직군, 세부 직업 이름 등 자세히 말씀해주세요.";
+  private final UserTypeRepository userTypeRepository;
 
+  public QuestionDTO getQuestionMessage(Long userId, String kind, String interest) {
+  User user = userRepository.findById(userId).orElseThrow(() -> new CoreException(ErrorType.USER_NOT_FOUND, userId));
+  String startMessage = promptUtil.getStartConsult(user.getName());
+  String questionMessage = geminiService.getNewQuestion(promptUtil.getPromptMultiPrefix());
 
-        int QuestionNumber = 1; // 첫 질문은 1로 고정..
+  int questionNumber = 1; // 첫 질문은 1로 고정..
+  String storeQuestion = "홀랜드 적성 검사 기반 사용자 전공 및 사용자 진로 상담을 진행합니다.";
 
-        AiConsultationHistory aiConsultationHistory = AiConsultationHistory.of(null, userId, QuestionNumber, questionMessage, null);
-        AiConsultationHistory result = aiConsultationHistoryRepository.save(aiConsultationHistory);
+  AiConsultationHistory aiConsultationHistory = AiConsultationHistory.of(null, userId, questionNumber, storeQuestion, null, kind, interest);
+  AiConsultationHistory result = aiConsultationHistoryRepository.save(aiConsultationHistory);
 
-        return QuestionDTO.of(result.getAiConsultationHistoryId(), result.getUserId(), result.getQuestionNumber(), result.getQuestionMessage(), result.getAnswer());
-    }
+  String[] multiMessage = checkMultiMessage(questionMessage);
 
-    @Transactional
-    public QuestionDTO getNewQuestionMessage(QuestionDTO questionDTO) {
-        AiConsultationHistory aiConsultationHistory = aiConsultationHistoryRepository.findById(questionDTO.getAiConsultationHistoryId())
-                .orElseThrow(() -> new CoreException(ErrorType.CONSULTATION_HISTORY_NOT_FOUND, questionDTO.getAiConsultationHistoryId()));
+  if (multiMessage.length > 1) {
+    startMessage += "아래 선택지 중 하나를 선택해주세요!";
+  } else {
+    startMessage += "어떤 분야에 관심이 있나요?";
+  }
 
-        // 답변 저장
-        aiConsultationHistory.setAnswer(questionDTO.getAnswer());
-        aiConsultationHistoryRepository.save(aiConsultationHistory);
+  return QuestionDTO.of(
+      result.getAiConsultationHistoryId(),
+      result.getUserId(),
+      result.getQuestionNumber(),
+      startMessage,
+      result.getAnswer(),
+      multiMessage);
+  }
 
-        // 새로운 질문 생성 > gemini
-        String newQuestionMessage = geminiService.getNewQuestion(aiConsultationHistory.getQuestionMessage(), questionDTO.getAnswer());
+  @Transactional
+  public QuestionDTO getNewQuestionMessage(QuestionDTO questionDTO) {
+    AiConsultationHistory aiConsultationHistory = aiConsultationHistoryRepository.findById(questionDTO.getAiConsultationHistoryId())
+        .orElseThrow(() -> new CoreException(ErrorType.CONSULTATION_HISTORY_NOT_FOUND, questionDTO.getAiConsultationHistoryId()));
 
-        AiConsultationHistory newAiConsultationHistory = AiConsultationHistory.of(null
-                , questionDTO.getUserId()
-                , aiConsultationHistory.getQuestionNumber()
-                , newQuestionMessage
-                , null);
+    // 답변 저장
+    aiConsultationHistory.setAnswer(questionDTO.getAnswer());
+    aiConsultationHistoryRepository.save(aiConsultationHistory);
 
-        newAiConsultationHistory.incrementQuestionNumber();
-        AiConsultationHistory result = aiConsultationHistoryRepository.save(newAiConsultationHistory);
+    String prompt = promptUtil.getPromptPrefix() + promptUtil.getAnswerPrompt(questionDTO.getAnswer());
 
-        return QuestionDTO.of(result.getAiConsultationHistoryId(), result.getUserId(), result.getQuestionNumber(), result.getQuestionMessage(), result.getAnswer());
-    }
+    // 새로운 질문 생성 > gemini
+    String newQuestionMessage = geminiService.getNewQuestion(prompt);
 
-    public AiConsultationSummaryHistoryDTO getSummary(Long userId) {
-        List<AiConsultationHistory> aiConsultationHistoryList = aiConsultationHistoryRepository.findByUserId(userId);
+    AiConsultationHistory newAiConsultationHistory = AiConsultationHistory.of(null
+        , questionDTO.getUserId()
+        , aiConsultationHistory.getQuestionNumber()
+        , newQuestionMessage
+        , null
+        , aiConsultationHistory.getInterest()
+        , aiConsultationHistory.getKind());
 
-        // gemini 에게 내용 전달후 상담 결과 요약 받기
-        String summary = geminiService.getSummary(aiConsultationHistoryList);
+    newAiConsultationHistory.incrementQuestionNumber();
+    AiConsultationHistory result = aiConsultationHistoryRepository.save(newAiConsultationHistory);
 
-        AiConsultationSummaryHistory aiConsultationSummaryHistory = AiConsultationSummaryHistory.of(null, userId, summary);
-        AiConsultationSummaryHistory result = aiConsultationSummaryHistoryRepository.save(aiConsultationSummaryHistory);
+    String[] multiMessage = checkMultiMessage(newQuestionMessage);
 
+    return QuestionDTO.of(
+        result.getAiConsultationHistoryId(),
+        result.getUserId(),
+        result.getQuestionNumber(),
+        result.getQuestionMessage(),
+        result.getAnswer(),
+        multiMessage);
+  }
+
+  public AiConsultationSummaryHistoryDTO getSummary(Long userId) {
+    List<AiConsultationHistory> aiConsultationHistoryList = aiConsultationHistoryRepository.findByUserId(userId);
+
+    // gemini 에게 내용 전달후 상담 결과 요약 받기
+    String summary = promptUtil.getConsultHistoryPrompt(aiConsultationHistoryList);
+
+    AiConsultationSummaryHistory aiConsultationSummaryHistory = AiConsultationSummaryHistory.of(null, userId, summary);
+    AiConsultationSummaryHistory result = aiConsultationSummaryHistoryRepository.save(aiConsultationSummaryHistory);
+
+    return AiConsultationSummaryHistoryDTO.of(result.getUserId(), result.getSummary(), result.getCreatedDate());
+  }
+
+  private String[] checkMultiMessage(String question) {
+    return question.contains("^")
+        ? question.split("^")
+        : new String[]{ question };
+  }
         return AiConsultationSummaryHistoryDTO.of(result.getUserId(), result.getSummary(), result.getCreatedDate());
     }
 
