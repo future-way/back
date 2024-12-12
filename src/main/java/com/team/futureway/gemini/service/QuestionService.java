@@ -38,6 +38,8 @@ public class QuestionService {
                         "^" + user.getName() + "님은 어떤 분야에 관심이 있으신가요?" +
                         "구체적으로 말해주실수록 더 좋아요! 산업, 직군, 세부 직업 이름 등 자세히 말씀해주세요.";
 
+        // String newQuestionMessage = geminiService.getNewQuestion("", "");
+
         int QuestionNumber = 1; // 첫 질문은 1로 고정..
 
         AiConsultationHistory aiConsultationHistory = AiConsultationHistory.of(null, userId, QuestionNumber, questionMessage, null);
