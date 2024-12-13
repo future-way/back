@@ -1,3 +1,4 @@
+/*
 package com.team.futureway.common;
 
 import org.springframework.context.annotation.Bean;
@@ -26,3 +27,4 @@ public class CorsConfig {
   }
 
 }
+*/
