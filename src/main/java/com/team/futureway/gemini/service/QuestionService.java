@@ -16,6 +16,7 @@ import com.team.futureway.gemini.util.PromptUtil;
 import com.team.futureway.user.entity.User;
 import com.team.futureway.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class QuestionService {
 
     private final UserRepository userRepository;
@@ -61,8 +63,10 @@ public class QuestionService {
         aiConsultationHistory.setAnswer(questionDTO.getAnswer());
         aiConsultationHistoryRepository.save(aiConsultationHistory);
 
-        String prompt = promptUtil.getAnswerPrompt(questionDTO.getAnswer()) + promptUtil.getPromptPrefix();
+        log.info("message :" + questionDTO.getQuestionMessage() +", answer : "+ questionDTO.getAnswer() +", historyId: "+ questionDTO.getAiConsultationHistoryId());
 
+        String prompt = promptUtil.getAnswerPrompt(questionDTO.getAnswer()) + promptUtil.getPromptPrefix();
+        log.info("prompt :" + prompt);
         String newQuestionMessage = geminiService.getNewQuestion(prompt);
 
         AiConsultationHistory newAiConsultationHistory = AiConsultationHistory.of(null
