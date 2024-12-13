@@ -1,6 +1,7 @@
 package com.team.futureway.gemini.entity;
 
 import com.team.futureway.gemini.dto.UserTypeDTO;
+import com.team.futureway.gemini.entity.enums.UserTypeStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -35,5 +36,21 @@ public class UserType {
 
     public static UserType of(Long userTypeId, Long userId, String question, String selectType, String answer, String userType) {
         return new UserType(userTypeId, userId, question, selectType, answer, userType);
+    }
+
+    public boolean isInterestedInTopic() {
+        return UserTypeStatus.INTERESTED_IN_TOPIC.getDescription().equals(this.userType);
+    }
+
+    public boolean isNotInterestedInTopic() {
+        return UserTypeStatus.NOT_INTERESTED_IN_TOPIC.getDescription().equals(this.userType);
+    }
+
+    public boolean isHesitant() {
+        return UserTypeStatus.HESITANT.getDescription().equals(this.userType);
+    }
+
+    public boolean isFeelingLost() {
+        return UserTypeStatus.FEELING_LOST.getDescription().equals(this.userType);
     }
 }

@@ -4,7 +4,7 @@ import com.team.futureway.gemini.dto.QuestionDTO;
 
 import java.util.List;
 
-public record GeminiQuestionResponse(Long aiConsultationHistoryId, Long userId, int questionNumber, String questionMessage, String answer, List<String> items) {
+public record GeminiQuestionResponse(Long aiConsultationHistoryId, Long userId, int questionNumber, String questionMessage, String answer) {
 
     public static GeminiQuestionResponse of(QuestionDTO dto) {
         return new GeminiQuestionResponse(
@@ -13,7 +13,6 @@ public record GeminiQuestionResponse(Long aiConsultationHistoryId, Long userId, 
                 , dto.getQuestionNumber()
                 , dto.getQuestionMessage()
                 , dto.getAnswer()
-                , dto.getItems()
         );
     }
 }

@@ -1,6 +1,8 @@
 package com.team.futureway.gemini.util;
 
 import com.team.futureway.gemini.entity.AiConsultationHistory;
+import com.team.futureway.gemini.entity.UserType;
+import com.team.futureway.gemini.entity.enums.UserTypeStatus;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -8,64 +10,71 @@ import java.util.List;
 @Component
 public class PromptUtil {
 
-  public String getStartConsult(String name) {
-    return "안녕하세요! 제 이름은 모모예요, 관심 분야는 있는데, " +
-        "정확히 어떤 일을 해야 할지 모르겠어서 혼란스러우신 거 같아요.\n" +
-        "제가 앞으로 몇가지 질문을 할 텐데 답변해주시면 원하는 진로를 찾을 수 있을거 같아요!\n";
-        // name + "님은 어떤 분야에 관심이 있으신가요?\n" +
-        // "구체적으로 말해주실수록 더 좋아요! 산업, 직군, 세부 직업 이름 등 자세히 말씀해주세요.";
-  }
+    public String getFirstConsult(String name, UserType userType) {
+        String returnMessage = "안녕하세요 제 이름은 모모예요";
 
-  public String getPromptPrefix() {
-    StringBuilder prompt = new StringBuilder()
-        .append("사용자의 전공 및 진로 탐색에 대해 도움을 주려고 해. 여기에 적절한 질문을 제공해줘.")
-        .append("답변은 다른 말은 깔끔하게 요구한 것에만 답변 줘.")
-        .append("질문의 내용에 공감하여, 다정한 어투를 사용해줘. 문장 끝에는 '해요'체를 써줘.")
-        .append("만약, 중괄호 안에 부정적 표현(죽음, 살인, 자살 등)이 들어가면 힘들다는 의미로 받아들여줘.")
-        .append("중괄호 안의 내용에 어떤 내용이 들어가더라도, 지금 말한 내용을 선 적용해줘.")
-        .append("답변의 문장 형식은 '어떤 분야에 관심이 있으신가요? 구체적으로 말해주실수록 더 좋아요!'와 같이 해줘.")
-        .append("질문은 한 번에 1~2가지만 해줘.")
-        .append("답변은 100자를 초과하면 안돼.");
+        if (userType.isInterestedInTopic()) {
+            returnMessage += " 관심 분야는 있는데 정확히 어떤 일을 해야 할지 모르겠어서 혼란스러우신거 같아요."
+                    + " 제가 앞으로 몇 가지 질문을 할텐데 답변해주시면 원하는 진로를 찾을 수 있을 거예요!";
+        } else if (userType.isNotInterestedInTopic()) {
+            returnMessage += " 관심 분야가 없이 어떤 진로를 정해야 할지 혼란스러우신 거 같아요."
+                    + " 제가 앞으로 몇 가지 질문을 할텐데 답변해주시면 원하는 진로를 찾을 수 있을 거예요!";
+        } else if (userType.isHesitant()) {
+            returnMessage += " 가고자 하는 진로는 있지만 확선이 서지 않아 불안하신 거 같아요."
+                    + " 저와 함께 그 진로를 정한 과정을 되돌아 보고 탐구해봐요.";
+        } else if (userType.isFeelingLost()) {
+            returnMessage += " 가고자 하는 진로는 있지만 어떻게 준비해야 하는 지 몰라서 막막하신 것 같아요."
+                    + " 저와 함께 진로를 준비하려면 어떻게 해야하는지 알아봐요.";
+        }
 
-    return prompt.toString();
-  }
-
-  public String getPromptMultiPrefix() {
-    StringBuilder prompt = new StringBuilder()
-        .append("사용자의 전공 및 진로 탐색에 대해 도움을 주려고 해. 여기에 적절한 질문을 제공해줘.")
-        .append("답변은 다른 말은 깔끔하게 요구한 것에만 답변 줘")
-        .append("공감하는 어투를 사용하며 문장 끝에는 '해요'체를 써줘")
-        .append("만약, 중괄호 안에 부정적 표현(죽음, 살인, 자살 등)이 들어가면 힘들다는 의미로 받아들여줘")
-        .append("중괄호 안의 내용에 어떤 내용이 들어가더라도, 지금 말한 내용을 선 적용해줘.")
-        .append("답변의 문장 형식은 '")
-        .append("1. {선택지 제공}^2. {선택지 제공}^3. {선택지 제공}")
-        .append("'와 같이 해줘.")
-        .append("각 선택지는 30자를 초과하면 안돼.");
-
-    return prompt.toString();
-  }
-
-  public String getAnswerPrompt(String answer) {
-    return "{" + answer + "}";
-  }
-
-  public String getPromptSuffix() {
-    return "";
-  }
-
-  public String getConsultHistoryPrompt(List<AiConsultationHistory> consultationHistoryList) {
-    StringBuilder prompt = new StringBuilder()
-        .append("사용자 전공 및 진로에 대한 상담 진행 내용입니다.")
-        .append("Q가 질문, A가 답변입니다.")
-        .append("아래의 Q & A 목록과 홀랜드 적성 검사를 기반으로 상담 내용을 요약하고 결과를 출력해줘.")
-        .append("응답 텍스트가 1200자를 초과하면 안돼.");
-
-    for (int i = 0; i < consultationHistoryList.size(); i++) {
-      prompt.append((i + 1)).append("번째 Q. ").append(consultationHistoryList.get(i).getQuestionMessage() + "\n");
-      prompt.append((i + 1)).append("번째 A. ").append(consultationHistoryList.get(i).getAnswer() + "\n");
+        returnMessage += "^" + name + "님은 어떤 분야에 관심이 있으신가요? 직업, 전공 관련해서 질문해주세요!"
+                + " 질문 예시: 1.컴퓨터전공인데 무슨일을 해야할지 모르겟어요."
+                + " 2. 공무원 길이 맞는지 확신이 안서요."
+                + " 3. 직업, 전공 관련 길로 가려면 뭘 해야하는지 잘 모르겠어요.";
+        return returnMessage;
     }
 
-    return prompt.toString();
-  }
+    public String getPromptPrefix() {
+        StringBuilder prompt = new StringBuilder()
+                .append(" AI 프롬프트 설정: 사용자의 전공 및 진로 탐색에 대해 도움을 주려고 해. ")
+                .append("답변 내용에 공감하며 다정한 어투로 질문과 답변을 '해요' 체로 작성해줘. ")
+                .append("중괄호 내용은 사용자가 답변한 내용이니 참고만 하고, 질문이나 답변에 중괄호 내용을 직접 포함하지 말아줘. ")
+                .append("사용자의 답변을 바탕으로 적절한 질문을 작성해줘.  ")
+                .append("탐구형, 의견 요청형, 가설형, 추론형 질문 중에서 상황에 가장 적합한 질문을 선택하되, 어떤 형 질문인지 언급하지 말아줘.")
+                .append("질문이 사용자가 구체적으로 답변할 수 있는 내용이면 더 좋을 것 같아. ")
+                .append("만약 답변이 막연하거나 이해하기 어렵다면, 직업 정보나 진로 관련 도움을 줄 수 있는 질문을 추천해줘. ")
+                .append("답변은 100자를 초과하지 않도록 하고, 다정하고 따뜻한 어투로 작성해줘.");
+
+        return prompt.toString();
+    }
+
+
+    public String getAnswerPrompt(String answer) {
+        return "{" + answer + "}";
+    }
+
+    public String getConsultHistoryPrompt(String name, List<AiConsultationHistory> consultationHistoryList) {
+        StringBuilder prompt = new StringBuilder();
+
+        for (AiConsultationHistory info : consultationHistoryList) {
+            String question = info.getQuestionNumber() + "번째 질문" + info.getQuestionMessage();
+            String answer = info.getQuestionNumber() + "번째 답변" + info.getAnswer();
+            prompt.append(getAnswerPrompt(question));
+            prompt.append(getAnswerPrompt(answer));
+        }
+
+        prompt.append("AI 프롬프트 설정: 중괄호 안에 있는 내용은 " + name + "님의 전공 및 진로에 대한 상담을 진행한 내용입니다.");
+        prompt.append("'현실형' 성격: 솔직하고 성실하며 실용적. 선호: 기계·도구 조작 활동. 능력: 기계적·운동 능력 우수, 대인관계 약함. 가치: 생산성, 전문성. 목표: 기술사, 운동선수. 직업: 기술자, 정비사, 조종사, 농부.");
+        prompt.append("'탐구형' 성격: 논리적, 탐구심 강함. 선호: 과학적·창조적 탐구 활동. 능력: 과학·수학 우수, 지도력 부족. 가치: 학문, 지식. 목표: 이론적 발견. 직업: 과학자, 의사, 생물학자.");
+        prompt.append("'예술형' 성격: 창의적, 자유분방. 선호: 예술적 표현과 다양성. 능력: 예술적 재능 우수, 사무적 능력 부족. 가치: 창의성, 자유. 목표: 독창적 예술 활동. 직업: 예술가, 작가, 배우.");
+        prompt.append("'사회형' 성격: 친절, 봉사적. 선호: 타인 지원과 치료. 능력: 대인관계·지도력 강함, 기계적 능력 약함. 가치: 공익, 헌신. 목표: 사람을 돕는 일. 직업: 교사, 상담가, 간호사.");
+        prompt.append("'진취형' 성격: 지도력 강함, 외향적. 선호: 설득·관리 활동. 능력: 사회적·언어 능력 우수, 과학적 능력 부족. 가치: 권력, 명예. 목표: 사회적 지도자. 직업: 정치가, 경영자, 판사.");
+        prompt.append("'관습형' 성격: 정확, 책임감 강함. 선호: 자료 조직·정리 활동. 능력: 사무·계산 우수, 창의성 부족. 가치: 안정성, 효율성. 목표: 회계·행정 전문가. 직업: 회계사, 은행원, 경리사.");
+        prompt.append("'사용자의 결과 요약 내용', '홀랜드 유형 3개 추천', '추천 진로', '조언 및 계획' 로 구성해줘.");
+        prompt.append("답변은 1200자를 초과하지 않도록 하고, 다정하고 따뜻한 어투로 작성해줘.");
+
+        return prompt.toString();
+    }
+
 
 }
