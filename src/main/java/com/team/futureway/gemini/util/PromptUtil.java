@@ -11,17 +11,17 @@ import java.util.List;
 public class PromptUtil {
 
     public String getFirstConsult(String name, UserType userType) {
-        String returnMessage = "안녕하세요 제 이름은 모모예요";
+        String returnMessage = "안녕하세요 제 이름은 모모예요.";
 
         if (userType.isInterestedInTopic()) {
             returnMessage += " 관심 분야는 있는데 정확히 어떤 일을 해야 할지 모르겠어서 혼란스러우신거 같아요."
-                    + " 제가 앞으로 몇 가지 질문을 할텐데 답변해주시면 원하는 진로를 찾을 수 있을 거예요!";
+                    + " 제가 앞으로 몇 가지 질문을 드릴 텐데, 답변해주시면 원하는 진로를 찾을 수 있을 거예요!";
         } else if (userType.isNotInterestedInTopic()) {
-            returnMessage += " 관심 분야가 없이 어떤 진로를 정해야 할지 혼란스러우신 거 같아요."
-                    + " 제가 앞으로 몇 가지 질문을 할텐데 답변해주시면 원하는 진로를 찾을 수 있을 거예요!";
+            returnMessage += " 관심 분야가 없이 어떤 진로를 정해야 할지 혼란스러우신 것 같아요."
+                    + " 제가 앞으로 몇 가지 질문을 드릴 텐데, 답변해주시면 원하는 진로를 찾을 수 있을 거예요!";
         } else if (userType.isHesitant()) {
-            returnMessage += " 가고자 하는 진로는 있지만 확선이 서지 않아 불안하신 거 같아요."
-                    + " 저와 함께 그 진로를 정한 과정을 되돌아 보고 탐구해봐요.";
+            returnMessage += " 가고자 하는 진로는 있지만 확신이 서지 않아 불안하신 거 같아요."
+                    + " 저와 함께 그 진로를 정한 과정을 되돌아보고 탐구해 봐요.";
         } else if (userType.isFeelingLost()) {
             returnMessage += " 가고자 하는 진로는 있지만 어떻게 준비해야 하는 지 몰라서 막막하신 것 같아요."
                     + " 저와 함께 진로를 준비하려면 어떻게 해야하는지 알아봐요.";
