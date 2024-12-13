@@ -46,7 +46,7 @@ public class QuestionService {
 
         String firstMessage = promptUtil.getFirstConsult(user.getName(), userType);
 
-        int questionNumber = 1; // 첫 질문은 1로 고정..
+        int questionNumber = 1; // 첫 질문은 1로 고정
 
         AiConsultationHistory aiConsultationHistory = AiConsultationHistory.of(null, userId, questionNumber, firstMessage, null);
         AiConsultationHistory result = aiConsultationHistoryRepository.save(aiConsultationHistory);
@@ -56,29 +56,47 @@ public class QuestionService {
 
     @Transactional
     public QuestionDTO getNewQuestionMessage(QuestionDTO questionDTO) {
-        AiConsultationHistory aiConsultationHistory = aiConsultationHistoryRepository.findById(questionDTO.getAiConsultationHistoryId())
+
+        AiConsultationHistory existingHistory = aiConsultationHistoryRepository.findById(questionDTO.getAiConsultationHistoryId())
                 .orElseThrow(() -> new CoreException(ErrorType.CONSULTATION_HISTORY_NOT_FOUND, questionDTO.getAiConsultationHistoryId()));
 
-        // 답변 저장
-        aiConsultationHistory.setAnswer(questionDTO.getAnswer());
-        aiConsultationHistoryRepository.save(aiConsultationHistory);
+        saveAnswerToHistory(existingHistory, questionDTO.getAnswer());
 
-        log.info("message :" + questionDTO.getQuestionMessage() +", answer : "+ questionDTO.getAnswer() +", historyId: "+ questionDTO.getAiConsultationHistoryId());
+        String prompt = generatePrompt(questionDTO.getUserId(), questionDTO.getAnswer());
 
-        String prompt = promptUtil.getAnswerPrompt(questionDTO.getAnswer()) + promptUtil.getPromptPrefix();
-        log.info("prompt :" + prompt);
         String newQuestionMessage = geminiService.getNewQuestion(prompt);
 
-        AiConsultationHistory newAiConsultationHistory = AiConsultationHistory.of(null
-                , questionDTO.getUserId()
-                , aiConsultationHistory.getQuestionNumber()
-                , newQuestionMessage
-                , null);
+        AiConsultationHistory newHistory = createNewConsultationHistory(questionDTO.getUserId(), existingHistory.getQuestionNumber(), newQuestionMessage);
+        AiConsultationHistory savedHistory = aiConsultationHistoryRepository.save(newHistory);
 
-        newAiConsultationHistory.incrementQuestionNumber();
-        AiConsultationHistory result = aiConsultationHistoryRepository.save(newAiConsultationHistory);
+        return mapToQuestionDTO(savedHistory);
+    }
 
-        return QuestionDTO.of(result.getAiConsultationHistoryId(), result.getUserId(), result.getQuestionNumber(), result.getQuestionMessage(), result.getAnswer());
+    private void saveAnswerToHistory(AiConsultationHistory history, String answer) {
+        history.setAnswer(answer);
+        aiConsultationHistoryRepository.save(history);
+    }
+
+    private String generatePrompt(Long userId, String answer) {
+        List<AiConsultationHistory> historyList = aiConsultationHistoryRepository.findByUserId(userId);
+        String consultationHistory = promptUtil.extractConsultationHistory(historyList).toString();
+        return consultationHistory + promptUtil.getPromptPrefix();
+    }
+
+    private AiConsultationHistory createNewConsultationHistory(Long userId, int questionNumber, String newQuestionMessage) {
+        AiConsultationHistory newHistory = AiConsultationHistory.of(null, userId, questionNumber, newQuestionMessage, null);
+        newHistory.incrementQuestionNumber();
+        return newHistory;
+    }
+
+    private QuestionDTO mapToQuestionDTO(AiConsultationHistory history) {
+        return QuestionDTO.of(
+                history.getAiConsultationHistoryId(),
+                history.getUserId(),
+                history.getQuestionNumber(),
+                history.getQuestionMessage(),
+                history.getAnswer()
+        );
     }
 
     public AiConsultationSummaryHistoryDTO getSummary(Long userId) {
