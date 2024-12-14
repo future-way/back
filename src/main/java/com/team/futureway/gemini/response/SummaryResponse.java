@@ -3,13 +3,10 @@ package com.team.futureway.gemini.response;
 import com.team.futureway.gemini.dto.AiConsultationSummaryHistoryDTO;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
-public record SummaryResponse(
-        Long userId,           // 사용자 아이디
-        String summary,        // 요약 내용
-        LocalDateTime createdDate // 생성 일자
-) {
+public record SummaryResponse(Long userId, String summary, String userType, LocalDateTime createdDate, List<String> hollandTypes) {
     public static SummaryResponse of(AiConsultationSummaryHistoryDTO dto) {
-        return new SummaryResponse(dto.getUserId(), dto.getSummary(), dto.getCreatedDate());
+        return new SummaryResponse(dto.getUserId(), dto.getSummary(), dto.getUserType(), dto.getCreatedDate(), dto.getHollandTypes());
     }
 }
