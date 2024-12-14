@@ -45,14 +45,16 @@ public class QuestionService {
 
         UserType userType = userTypeRepository.findByUserId(userId);
 
-        String firstMessage = promptUtil.getFirstConsult(user.getName(), userType);
+        String consultType = promptUtil.setConsultTitle(userType);
 
         int questionNumber = 1; // 첫 질문은 1로 고정
 
-        AiConsultationHistory aiConsultationHistory = AiConsultationHistory.of(null, userId, questionNumber, firstMessage, null);
+        AiConsultationHistory aiConsultationHistory = AiConsultationHistory.of(null, userId, questionNumber, consultType, null);
         AiConsultationHistory result = aiConsultationHistoryRepository.save(aiConsultationHistory);
 
-        return QuestionDTO.of(result.getAiConsultationHistoryId(), result.getUserId(), result.getQuestionNumber(), result.getQuestionMessage(), result.getAnswer(), LocalDateTime.now());
+        String greetings = promptUtil.consultGreetings(user.getName(), result.getQuestionMessage());
+
+        return QuestionDTO.of(result.getAiConsultationHistoryId(), result.getUserId(), result.getQuestionNumber(), greetings, result.getAnswer(), LocalDateTime.now());
     }
 
     @Transactional
@@ -63,7 +65,7 @@ public class QuestionService {
 
         saveAnswerToHistory(existingHistory, questionDTO.getAnswer());
 
-        String prompt = generatePrompt(questionDTO.getUserId(), questionDTO.getAnswer());
+        String prompt = generatePrompt(questionDTO.getUserId());
 
         String newQuestionMessage = geminiService.getNewQuestion(prompt);
 
@@ -78,9 +80,12 @@ public class QuestionService {
         aiConsultationHistoryRepository.save(history);
     }
 
-    private String generatePrompt(Long userId, String answer) {
+    private String generatePrompt(Long userId) {
         List<AiConsultationHistory> historyList = aiConsultationHistoryRepository.findByUserId(userId);
         String consultationHistory = promptUtil.extractConsultationHistory(historyList).toString();
+
+        log.info("PROMPT > {}", consultationHistory);
+
         return consultationHistory + promptUtil.getPromptPrefix();
     }
 

@@ -43,12 +43,6 @@ public class GeminiService {
     // API 응답을 JSON 파싱
     String responseBody = response.getBody();
 
-    try {
-      // 출력 또는 반환
-      return parseGeminiMessageUtil.parseMessage(responseBody);
-    } catch (Exception e) {
-        e.printStackTrace();
-        return null;
-    }
+    return parseGeminiMessageUtil.parseMessage(responseBody);
   }
 }

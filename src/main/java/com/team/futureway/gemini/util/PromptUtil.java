@@ -10,28 +10,30 @@ import java.util.List;
 @Component
 public class PromptUtil {
 
-    public String getFirstConsult(String name, UserType userType) {
-        String returnMessage = "안녕하세요 제 이름은 모모예요.";
+    public String consultGreetings(String name, String title) {
+        return "안녕하세요! 제 이름은 모모예요.\n"
+            + title + "^" + name + "님은 어떤 분야에 관심이 있으신가요? 직업, 전공 관련해서 질문해주세요!\n"
+            + " 질문 예시:\n1.컴퓨터전공인데 무슨일을 해야할지 모르겠어요.\n"
+            + " 2. 공무원 길이 맞는지 확신이 안서요.\n"
+            + " 3. 직업, 전공 관련 길로 가려면 뭘 해야하는지 잘 모르겠어요.\n";
+    }
 
+    public String setConsultTitle(UserType userType) {
         if (userType.isInterestedInTopic()) {
-            returnMessage += " 관심 분야는 있는데 정확히 어떤 일을 해야 할지 모르겠어서 혼란스러우신거 같아요."
-                    + " 제가 앞으로 몇 가지 질문을 드릴 텐데, 답변해주시면 원하는 진로를 찾을 수 있을 거예요!";
+            return " 관심 분야는 있는데 정확히 어떤 일을 해야 할지 모르겠어서 혼란스러우신거 같아요."
+                + " 제가 앞으로 몇 가지 질문을 드릴 텐데, 답변해주시면 원하는 진로를 찾을 수 있을 거예요!";
         } else if (userType.isNotInterestedInTopic()) {
-            returnMessage += " 관심 분야가 없이 어떤 진로를 정해야 할지 혼란스러우신 것 같아요."
-                    + " 제가 앞으로 몇 가지 질문을 드릴 텐데, 답변해주시면 원하는 진로를 찾을 수 있을 거예요!";
+            return " 관심 분야가 없이 어떤 진로를 정해야 할지 혼란스러우신 것 같아요."
+                + " 제가 앞으로 몇 가지 질문을 드릴 텐데, 답변해주시면 원하는 진로를 찾을 수 있을 거예요!";
         } else if (userType.isHesitant()) {
-            returnMessage += " 가고자 하는 진로는 있지만 확신이 서지 않아 불안하신 거 같아요."
-                    + " 저와 함께 그 진로를 정한 과정을 되돌아보고 탐구해 봐요.";
+            return " 가고자 하는 진로는 있지만 확신이 서지 않아 불안하신 거 같아요."
+                + " 저와 함께 그 진로를 정한 과정을 되돌아보고 탐구해 봐요.";
         } else if (userType.isFeelingLost()) {
-            returnMessage += " 가고자 하는 진로는 있지만 어떻게 준비해야 하는 지 몰라서 막막하신 것 같아요."
-                    + " 저와 함께 진로를 준비하려면 어떻게 해야하는지 알아봐요.";
+            return " 가고자 하는 진로는 있지만 어떻게 준비해야 하는 지 몰라서 막막하신 것 같아요."
+                + " 저와 함께 진로를 준비하려면 어떻게 해야하는지 알아봐요.";
         }
-
-        returnMessage += "^" + name + "님은 어떤 분야에 관심이 있으신가요? 직업, 전공 관련해서 질문해주세요!"
-                + " 질문 예시: 1.컴퓨터전공인데 무슨일을 해야할지 모르겟어요."
-                + " 2. 공무원 길이 맞는지 확신이 안서요."
-                + " 3. 직업, 전공 관련 길로 가려면 뭘 해야하는지 잘 모르겠어요.";
-        return returnMessage;
+        return "앞으로 어떤 진로를 선택해야 하는지 고민이 많으신 것 같아요."
+            + " 제가 앞으로 몇 가지 질문을 드릴 텐데, 답변해주시면 진로를 찾는데 도움이 될거에요.";
     }
 
     public String getPromptPrefix() {
@@ -40,6 +42,7 @@ public class PromptUtil {
                 .append("중괄호는 질문과 답변으로 사용자가 질문을 보고 답변한 내용이고, 질문은 중복되지 않게 사용자의 답변을 참고해 진로 탐색을 할 수 있게 질문 작성해줘. ")
                 .append("질문이 사용자가 구체적으로 답변할 수 있는 내용이면 더 좋을 것 같아. ")
                 .append("만약 답변이 막연하거나 이해하기 어렵다면, 직업 또는 진로 관련 도움을 줄 수 있는 질문을 추천해줘. ")
+                .append("질문은 여러 개가 나오더라도 ")
                 .append("답변은 글자수 100미만이고 다정하고 따뜻한 어투로 작성해줘.");
 
         return prompt.toString();
@@ -73,8 +76,8 @@ public class PromptUtil {
         StringBuilder historyBuilder = new StringBuilder();
 
         for (AiConsultationHistory info : consultationHistoryList) {
-            String question = info.getQuestionNumber() + "번째 질문" + info.getQuestionMessage();
-            String answer = info.getQuestionNumber() + "번째 답변" + info.getAnswer();
+            String question = info.getQuestionNumber() + "번째 질문은 " + info.getQuestionMessage() + ". ";
+            String answer = info.getQuestionNumber() + "번째 답변은 " + info.getAnswer() + ". ";
             historyBuilder.append(getAnswerPrompt(question));
             historyBuilder.append(getAnswerPrompt(answer));
         }
