@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.LocalDateTime;
+
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Getter
@@ -16,9 +18,10 @@ public class AnswerDTO {
     private int questionNumber; // 질문 번호
     private String newQuestionMessage; // 질문 메시지
     private String answer; // 답변
+    private LocalDateTime createdDate; // 생성 일자
 
-    public static AnswerDTO of(Long aiConsultationHistoryId, Long userId, int questionNumber, String newQuestionMessage, String answer) {
-        return new AnswerDTO(aiConsultationHistoryId, userId, questionNumber, newQuestionMessage, answer);
+    public static AnswerDTO of(Long aiConsultationHistoryId, Long userId, int questionNumber, String newQuestionMessage, String answer, LocalDateTime createdDate) {
+        return new AnswerDTO(aiConsultationHistoryId, userId, questionNumber, newQuestionMessage, answer, createdDate);
     }
 
 

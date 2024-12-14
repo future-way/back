@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Getter
@@ -29,8 +31,11 @@ public class AiConsultationHistory {
     @Column(name = "answer", length = 255)
     private String answer;
 
+    @Column(name = "created_date", nullable = false)
+    private LocalDateTime createdDate; // 생성 일자
+
     public static AiConsultationHistory of(Long aiConsultationHistoryId, Long userId, int questionNumber, String questionMessage, String answer) {
-        return new AiConsultationHistory(aiConsultationHistoryId, userId, questionNumber, questionMessage, answer);
+        return new AiConsultationHistory(aiConsultationHistoryId, userId, questionNumber, questionMessage, answer, LocalDateTime.now());
     }
 
     public void incrementQuestionNumber() {
