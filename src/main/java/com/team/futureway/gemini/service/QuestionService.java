@@ -21,6 +21,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -111,7 +113,14 @@ public class QuestionService {
         AiConsultationSummaryHistory aiConsultationSummaryHistory = AiConsultationSummaryHistory.of(null, userId, summary);
         AiConsultationSummaryHistory result = aiConsultationSummaryHistoryRepository.save(aiConsultationSummaryHistory);
 
-        return AiConsultationSummaryHistoryDTO.of(result.getUserId(), result.getSummary(), result.getCreatedDate());
+        List<String> hollandTypes = extractDataInsideBraces(result.getSummary());
+
+        return AiConsultationSummaryHistoryDTO.of(result.getUserId(), result.getSummary(), result.getCreatedDate(), hollandTypes);
+    }
+
+    public List<String> extractDataInsideBraces(String input) {
+        String innerContent = input.substring(input.indexOf('{') + 1, input.indexOf('}')).trim();
+        return new ArrayList<>(Arrays.asList(innerContent.split(",")));
     }
 
 
