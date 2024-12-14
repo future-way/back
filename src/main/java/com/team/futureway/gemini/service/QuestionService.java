@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -115,14 +116,32 @@ public class QuestionService {
 
         List<String> hollandTypes = extractDataInsideBraces(result.getSummary());
 
-        return AiConsultationSummaryHistoryDTO.of(result.getUserId(), result.getSummary(), result.getCreatedDate(), hollandTypes);
+        UserType userType = userTypeRepository.findByUserId(userId);
+
+        String cleanedSummary = removeDataInsideBraces(result.getSummary());
+
+        return AiConsultationSummaryHistoryDTO.of(result.getUserId(), cleanedSummary, userType.getUserType(), result.getCreatedDate(), hollandTypes);
     }
 
     public List<String> extractDataInsideBraces(String input) {
-        String innerContent = input.substring(input.indexOf('{') + 1, input.indexOf('}')).trim();
+        log.info("중괄호 제거: " + input);
+        int startIndex = input.indexOf('{');
+        int endIndex = input.indexOf('}');
+
+        // 중괄호가 없으면 빈 리스트 반환
+        if (startIndex == -1 || endIndex == -1 || startIndex >= endIndex) {
+            return Collections.emptyList();
+        }
+
+        // 중괄호 안의 내용 추출
+        String innerContent = input.substring(startIndex + 1, endIndex).trim();
         return new ArrayList<>(Arrays.asList(innerContent.split(",")));
     }
 
+    public String removeDataInsideBraces(String input) {
+        // 중괄호와 그 안의 내용을 삭제
+        return input.replaceAll("\\{.*?\\}", "").trim();
+    }
 
     public UserTypeDTO saveUserType(UserTypeDTO userTypeDTO) {
         UserType userType = UserType.of(null

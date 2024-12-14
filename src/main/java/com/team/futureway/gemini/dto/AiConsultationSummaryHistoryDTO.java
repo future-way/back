@@ -10,12 +10,13 @@ import java.util.List;
 @AllArgsConstructor
 public class AiConsultationSummaryHistoryDTO {
 
-    private Long userId; // 사용자 아이디
-    private String summary; // 요약 내용
-    private LocalDateTime createdDate; // 생성 일자
+    private Long userId;
+    private String summary;
+    private String userType;
+    private LocalDateTime createdDate;
     private List<String> hollandTypes;
 
-    public static AiConsultationSummaryHistoryDTO of(Long userId, String summary, LocalDateTime createdDate, List<String> hollandTypes) {
-        return new AiConsultationSummaryHistoryDTO(userId, summary, createdDate, hollandTypes);
+    public static AiConsultationSummaryHistoryDTO of(Long userId, String summary, String userType,  LocalDateTime createdDate, List<String> hollandTypes) {
+        return new AiConsultationSummaryHistoryDTO(userId, summary, userType, createdDate, hollandTypes);
     }
 }
