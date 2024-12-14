@@ -87,8 +87,6 @@ public class QuestionService {
         List<AiConsultationHistory> historyList = aiConsultationHistoryRepository.findByUserId(userId);
         String consultationHistory = promptUtil.extractConsultationHistory(historyList).toString();
 
-        log.info("PROMPT > {}", consultationHistory);
-
         return consultationHistory + promptUtil.getPromptPrefix();
     }
 
