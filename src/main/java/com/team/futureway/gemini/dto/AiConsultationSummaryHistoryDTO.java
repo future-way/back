@@ -4,16 +4,19 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @AllArgsConstructor
 public class AiConsultationSummaryHistoryDTO {
 
-    private Long userId; // 사용자 아이디
-    private String summary; // 요약 내용
-    private LocalDateTime createdDate; // 생성 일자
+    private Long userId;
+    private String summary;
+    private String userType;
+    private LocalDateTime createdDate;
+    private List<String> hollandTypes;
 
-    public static AiConsultationSummaryHistoryDTO of(Long userId, String summary, LocalDateTime createdDate) {
-        return new AiConsultationSummaryHistoryDTO(userId, summary, createdDate);
+    public static AiConsultationSummaryHistoryDTO of(Long userId, String summary, String userType,  LocalDateTime createdDate, List<String> hollandTypes) {
+        return new AiConsultationSummaryHistoryDTO(userId, summary, userType, createdDate, hollandTypes);
     }
 }
