@@ -8,7 +8,6 @@ import com.team.futureway.gemini.dto.UserTypeDTO;
 import com.team.futureway.gemini.entity.AiConsultationHistory;
 import com.team.futureway.gemini.entity.AiConsultationSummaryHistory;
 import com.team.futureway.gemini.entity.UserType;
-import com.team.futureway.gemini.entity.enums.UserTypeStatus;
 import com.team.futureway.gemini.repository.AiConsultationHistoryRepository;
 import com.team.futureway.gemini.repository.AiConsultationSummaryHistoryRepository;
 import com.team.futureway.gemini.repository.UserTypeRepository;
@@ -72,7 +71,9 @@ public class QuestionService {
 
         String newQuestionMessage = geminiService.getNewQuestion(prompt);
 
-        AiConsultationHistory newHistory = createNewConsultationHistory(questionDTO.getUserId(), existingHistory.getQuestionNumber(), newQuestionMessage);
+        String cleanedSummary = removeDataInsideBraces(newQuestionMessage);
+
+        AiConsultationHistory newHistory = createNewConsultationHistory(questionDTO.getUserId(), existingHistory.getQuestionNumber(), cleanedSummary);
         AiConsultationHistory savedHistory = aiConsultationHistoryRepository.save(newHistory);
 
         return mapToQuestionDTO(savedHistory);
