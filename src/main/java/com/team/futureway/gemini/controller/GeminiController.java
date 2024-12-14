@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+
 @Tag(name = "Gemini", description = "Gemini API")
 @RequiredArgsConstructor
 @RestController
@@ -34,7 +36,8 @@ public class GeminiController {
                 request.userId(),
                 0,
                 null,
-                request.answer()
+                request.answer(),
+                null
         );
         QuestionDTO result = questionService.getNewQuestionMessage(questionDTO);
         return ResponseEntity.ok(GeminiQuestionResponse.of(result));

@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -51,7 +52,7 @@ public class QuestionService {
         AiConsultationHistory aiConsultationHistory = AiConsultationHistory.of(null, userId, questionNumber, firstMessage, null);
         AiConsultationHistory result = aiConsultationHistoryRepository.save(aiConsultationHistory);
 
-        return QuestionDTO.of(result.getAiConsultationHistoryId(), result.getUserId(), result.getQuestionNumber(), result.getQuestionMessage(), result.getAnswer());
+        return QuestionDTO.of(result.getAiConsultationHistoryId(), result.getUserId(), result.getQuestionNumber(), result.getQuestionMessage(), result.getAnswer(), LocalDateTime.now());
     }
 
     @Transactional
@@ -95,7 +96,8 @@ public class QuestionService {
                 history.getUserId(),
                 history.getQuestionNumber(),
                 history.getQuestionMessage(),
-                history.getAnswer()
+                history.getAnswer(),
+                LocalDateTime.now()
         );
     }
 
