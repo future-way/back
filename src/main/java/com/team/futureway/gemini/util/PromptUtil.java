@@ -11,7 +11,7 @@ public class PromptUtil {
 
     public String consultGreetings(String name, String title) {
         return "안녕하세요! 제 이름은 모모예요.\n"
-            + title + name + "님은 어떤 분야에 관심이 있으신가요? 직업, 전공 관련해서 질문해주세요!\n"
+            + title + "\n" + name + "님은 어떤 분야에 관심이 있으신가요? 직업, 전공 관련해서 질문해주세요!\n"
             + " 질문 예시:\n 1. 컴퓨터 전공인데 무슨 일을 해야할지 모르겠어요.\n"
             + " 2. 공무원 길이 맞는지 확신이 안서요.\n"
             + " 3. 직업, 전공 관련 길로 가려면 뭘 해야하는지 잘 모르겠어요.\n";
