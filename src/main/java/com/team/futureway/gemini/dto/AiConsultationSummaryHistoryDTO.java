@@ -12,11 +12,12 @@ public class AiConsultationSummaryHistoryDTO {
 
     private Long userId;
     private String summary;
+    private String recommend;
     private String userType;
     private LocalDateTime createdDate;
     private List<String> hollandTypes;
 
-    public static AiConsultationSummaryHistoryDTO of(Long userId, String summary, String userType,  LocalDateTime createdDate, List<String> hollandTypes) {
-        return new AiConsultationSummaryHistoryDTO(userId, summary, userType, createdDate, hollandTypes);
+    public static AiConsultationSummaryHistoryDTO of(Long userId, String summary, String recommend, String userType,  LocalDateTime createdDate, List<String> hollandTypes) {
+        return new AiConsultationSummaryHistoryDTO(userId, summary, recommend, userType, createdDate, hollandTypes);
     }
 }

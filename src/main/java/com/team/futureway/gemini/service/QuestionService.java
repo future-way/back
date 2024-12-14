@@ -113,9 +113,10 @@ public class QuestionService {
         User user = userRepository.findById(userId).orElseThrow(() -> new CoreException(ErrorType.USER_NOT_FOUND, userId));
 
         // gemini 에게 내용 전달후 상담 결과 요약 받기
-        String summary = geminiService.getNewQuestion(promptUtil.getConsultHistoryPrompt(user.getName(), aiConsultationHistoryList));
+        String summary = geminiService.getNewQuestion(promptUtil.getConsultHistorySummaryPrompt(user.getName(), aiConsultationHistoryList));
+        String recommend = geminiService.getNewQuestion(promptUtil.getRecommendPrompt(user.getName(), summary));
 
-        AiConsultationSummaryHistory aiConsultationSummaryHistory = AiConsultationSummaryHistory.of(null, userId, summary);
+        AiConsultationSummaryHistory aiConsultationSummaryHistory = AiConsultationSummaryHistory.of(null, userId, summary, recommend);
         AiConsultationSummaryHistory result = aiConsultationSummaryHistoryRepository.save(aiConsultationSummaryHistory);
 
         List<String> hollandTypes = extractDataInsideBraces(result.getSummary());
@@ -128,7 +129,7 @@ public class QuestionService {
 
         String cleanedSummary = removeDataInsideBraces(result.getSummary());
 
-        return AiConsultationSummaryHistoryDTO.of(result.getUserId(), cleanedSummary, userType.getUserType(), result.getCreatedDate(), hollandTypes);
+        return AiConsultationSummaryHistoryDTO.of(result.getUserId(), cleanedSummary, recommend, userType.getUserType(), result.getCreatedDate(), hollandTypes);
     }
 
     public List<String> extractHollandTypes(String text) {
