@@ -25,11 +25,14 @@ public class AiConsultationSummaryHistory {
     @Column(name = "summary")
     private String summary; // 요약 내용
 
+    @Column(name = "recommend")
+    private String recommend; // 진로 추천 내용
+
     @Column(name = "created_date", nullable = false)
     private LocalDateTime createdDate; // 생성 일자
 
 
-    public static AiConsultationSummaryHistory of(Long aiConsultationSummaryHistoryId, Long userId, String summary) {
-        return new AiConsultationSummaryHistory(aiConsultationSummaryHistoryId, userId, summary, LocalDateTime.now());
+    public static AiConsultationSummaryHistory of(Long aiConsultationSummaryHistoryId, Long userId, String summary, String recommend) {
+        return new AiConsultationSummaryHistory(aiConsultationSummaryHistoryId, userId, summary, recommend, LocalDateTime.now());
     }
 }
