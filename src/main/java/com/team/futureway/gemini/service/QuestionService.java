@@ -86,7 +86,7 @@ public class QuestionService {
 
     private String generatePrompt(Long userId) {
         List<AiConsultationHistory> historyList = aiConsultationHistoryRepository.findByUserId(userId);
-        String consultationHistory = promptUtil.extractConsultationHistory(historyList).toString();
+        String consultationHistory = ""; // promptUtil.extractConsultationHistory(historyList).toString();
 
         return consultationHistory + promptUtil.getPromptPrefix();
     }
@@ -120,11 +120,28 @@ public class QuestionService {
 
         List<String> hollandTypes = extractDataInsideBraces(result.getSummary());
 
+        if (hollandTypes.isEmpty()) {
+            hollandTypes = extractHollandTypes(result.getSummary());
+        }
+
         UserType userType = userTypeRepository.findByUserId(userId);
 
         String cleanedSummary = removeDataInsideBraces(result.getSummary());
 
         return AiConsultationSummaryHistoryDTO.of(result.getUserId(), cleanedSummary, userType.getUserType(), result.getCreatedDate(), hollandTypes);
+    }
+
+    public List<String> extractHollandTypes(String text) {
+        List<String> hollandTypes = List.of("현실형", "탐구형", "예술형", "사회형", "진취형", "관습형");
+        List<String> extractedTypes = new ArrayList<>();
+
+        for (String type : hollandTypes) {
+            if (text.contains(type)) {
+                extractedTypes.add(type);
+            }
+        }
+
+        return extractedTypes;
     }
 
     public List<String> extractDataInsideBraces(String input) {

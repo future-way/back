@@ -20,16 +20,18 @@ public class GeminiService {
   private final ParseGeminiMessageUtil parseGeminiMessageUtil;
 
 
-  public String getNewQuestion(String QuestionMessage) {
+  public String getNewQuestion(String consultMessage) {
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
+
+    String consultData = consultMessage.replaceAll("\r?\n", "").replaceAll("\"", "").trim();
 
     // 스크립트 작성.
     StringBuffer json = new StringBuffer()
         // 데이터 형태
         .append("{\"contents\":[{\"parts\":[{\"text\":\"")
         // 공통
-        .append(QuestionMessage)
+        .append(consultData)
         // 데이터 형태
         .append("\"}]}]}");
 
@@ -41,6 +43,7 @@ public class GeminiService {
 
     ResponseEntity<String> response = restTemplate.exchange(SERVICE_URL + GEMINI_KEY, HttpMethod.POST, entity, String.class);
     // API 응답을 JSON 파싱
+
     String responseBody = response.getBody();
 
     return parseGeminiMessageUtil.parseMessage(responseBody);
