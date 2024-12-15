@@ -86,7 +86,7 @@ public class QuestionService {
 
     private String generatePrompt(Long userId) {
         List<AiConsultationHistory> historyList = aiConsultationHistoryRepository.findByUserId(userId);
-        String consultationHistory = ""; // promptUtil.extractConsultationHistory(historyList).toString();
+        String consultationHistory = promptUtil.extractConsultationHistory(historyList).toString();
 
         return consultationHistory + promptUtil.getPromptPrefix();
     }
@@ -166,14 +166,24 @@ public class QuestionService {
     }
 
     public UserTypeDTO saveUserType(UserTypeDTO userTypeDTO) {
-        UserType userType = UserType.of(null
-                , userTypeDTO.getUserId()
-                , userTypeDTO.getQuestion()
-                , userTypeDTO.getSelectType()
-                , userTypeDTO.getAnswer()
-                , userTypeDTO.getUserType()
+        UserType existUserType = userTypeRepository.findByUserId(userTypeDTO.getUserId());
+
+        Long userTypeId = null;
+
+        if (existUserType != null) {
+            userTypeId = existUserType.getUserTypeId();
+        }
+
+        UserType userType = UserType.of(userTypeId
+            , userTypeDTO.getUserId()
+            , userTypeDTO.getQuestion()
+            , userTypeDTO.getSelectType()
+            , userTypeDTO.getAnswer()
+            , userTypeDTO.getUserType()
         );
+
         UserType result = userTypeRepository.save(userType);
+
         return userTypeDTO.of(result.getUserId(), result.getQuestion(), result.getSelectType(), result.getAnswer(), result.getUserType());
     }
 
