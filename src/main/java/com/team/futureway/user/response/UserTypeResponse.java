@@ -1,6 +1,6 @@
-package com.team.futureway.gemini.response;
+package com.team.futureway.user.response;
 
-import com.team.futureway.gemini.dto.UserTypeDTO;
+import com.team.futureway.user.dto.UserTypeDTO;
 
 public record UserTypeResponse(
         Long userId,

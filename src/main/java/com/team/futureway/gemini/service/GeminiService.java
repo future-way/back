@@ -19,7 +19,6 @@ public class GeminiService {
 
   private final ParseGeminiMessageUtil parseGeminiMessageUtil;
 
-
   public String getNewQuestion(String consultMessage) {
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);

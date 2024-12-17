@@ -1,7 +1,6 @@
-package com.team.futureway.gemini.entity;
+package com.team.futureway.user.entity;
 
-import com.team.futureway.gemini.dto.UserTypeDTO;
-import com.team.futureway.gemini.entity.enums.UserTypeStatus;
+import com.team.futureway.user.entity.enums.UserTypeStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

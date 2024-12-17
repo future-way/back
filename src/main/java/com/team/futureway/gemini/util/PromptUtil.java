@@ -1,7 +1,7 @@
 package com.team.futureway.gemini.util;
 
-import com.team.futureway.gemini.entity.AiConsultationHistory;
-import com.team.futureway.gemini.entity.UserType;
+import com.team.futureway.consult.entity.Question;
+import com.team.futureway.user.entity.UserType;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -52,7 +52,7 @@ public class PromptUtil {
         return answer;
     }
 
-    public String getConsultHistorySummaryPrompt(String name, List<AiConsultationHistory> consultationHistoryList) {
+    public String getConsultHistorySummaryPrompt(String name, List<Question> consultationHistoryList) {
         return new StringBuilder()
             .append(extractConsultationHistory(consultationHistoryList))
             .append(" 중괄호 안에 있는 내용은 " + name + "님의 전공, 경험, 흥미로 진로에 대한 상담을 진행한 내용이야.")
@@ -78,10 +78,10 @@ public class PromptUtil {
     }
 
 
-    public StringBuilder extractConsultationHistory(List<AiConsultationHistory> consultationHistoryList) {
+    public StringBuilder extractConsultationHistory(List<Question> consultationHistoryList) {
         StringBuilder historyBuilder = new StringBuilder();
 
-        for (AiConsultationHistory info : consultationHistoryList) {
+        for (Question info : consultationHistoryList) {
             String question = info.getQuestionNumber() + "번째," + info.getQuestionMessage() + ". ";
             String answer = info.getQuestionNumber() + "번째," + info.getAnswer() + ". ";
             historyBuilder.append(getAnswerPrompt(question));

@@ -1,4 +1,4 @@
-package com.team.futureway.gemini.entity.enums;
+package com.team.futureway.user.entity.enums;
 
 import lombok.Getter;
 

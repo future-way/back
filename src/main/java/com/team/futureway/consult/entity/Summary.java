@@ -1,4 +1,4 @@
-package com.team.futureway.gemini.entity;
+package com.team.futureway.consult.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -12,12 +12,12 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Getter
 @Entity
-@Table(name = "ai_consultation_summary_history")
-public class AiConsultationSummaryHistory {
+@Table(name = "summary")
+public class Summary {
     @Id
-    @Column(name = "ai_consultation_summary_history_id")
+    @Column(name = "summary_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long aiConsultationSummaryHistoryId;
+    private Long summaryId;
 
     @Column(name = "user_id", nullable = false)
     private Long userId; // 사용자 아이디
@@ -32,7 +32,7 @@ public class AiConsultationSummaryHistory {
     private LocalDateTime createdDate; // 생성 일자
 
 
-    public static AiConsultationSummaryHistory of(Long aiConsultationSummaryHistoryId, Long userId, String summary, String recommend) {
-        return new AiConsultationSummaryHistory(aiConsultationSummaryHistoryId, userId, summary, recommend, LocalDateTime.now());
+    public static Summary of(Long aiConsultationSummaryHistoryId, Long userId, String summary, String recommend) {
+        return new Summary(aiConsultationSummaryHistoryId, userId, summary, recommend, LocalDateTime.now());
     }
 }

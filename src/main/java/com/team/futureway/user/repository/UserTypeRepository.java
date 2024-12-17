@@ -1,9 +1,7 @@
-package com.team.futureway.gemini.repository;
+package com.team.futureway.user.repository;
 
-import com.team.futureway.gemini.entity.UserType;
+import com.team.futureway.user.entity.UserType;
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import java.util.List;
 
 public interface UserTypeRepository extends JpaRepository<UserType, Long> {
     UserType findByUserId(Long userId);
