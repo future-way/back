@@ -45,4 +45,10 @@ public class Question {
     public void setAnswer(String answer) {
         this.answer = answer;
     }
+
+    public void removeBracesAndTextFromQuestion(String newQuestionMessage) {
+        if (newQuestionMessage != null) {
+            this.questionMessage = newQuestionMessage.replaceAll("\\{.*?\\}", "").trim();
+        }
+    }
 }

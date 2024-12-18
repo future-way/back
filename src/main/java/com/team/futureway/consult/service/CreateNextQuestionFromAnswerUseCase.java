@@ -20,7 +20,7 @@ import java.util.List;
 @Slf4j
 public class CreateNextQuestionFromAnswerUseCase {
 
-    private final QuestionRepository aiConsultationHistoryRepository;
+    private final QuestionRepository questionRepository;
 
     private final PromptUtil promptUtil;
 
@@ -29,30 +29,31 @@ public class CreateNextQuestionFromAnswerUseCase {
     @Transactional
     public QuestionDTO execute(QuestionDTO questionDTO) {
 
-        Question existingHistory = aiConsultationHistoryRepository.findById(questionDTO.getQuestionId())
+        Question question = questionRepository.findById(questionDTO.getQuestionId())
                 .orElseThrow(() -> new CoreException(ErrorType.CONSULTATION_HISTORY_NOT_FOUND, questionDTO.getQuestionId()));
 
-        saveAnswerToHistory(existingHistory, questionDTO.getAnswer());
+        saveAnswerToHistory(question, questionDTO.getAnswer());
 
         String prompt = generatePrompt(questionDTO.getUserId());
 
-        String newQuestionMessage = geminiService.getNewQuestion(prompt);
+        String createQuestion = geminiService.getNewQuestion(prompt);
 
-        String cleanedSummary = removeDataInsideBraces(newQuestionMessage);
+        question.removeBracesAndTextFromQuestion(createQuestion);
 
-        Question newHistory = createNewConsultationHistory(questionDTO.getUserId(), existingHistory.getQuestionNumber(), cleanedSummary);
-        Question savedHistory = aiConsultationHistoryRepository.save(newHistory);
+        Question newQuestion = createNewConsultationHistory(questionDTO.getUserId(), question.getQuestionNumber(), question.getQuestionMessage());
+
+        Question savedHistory = questionRepository.save(newQuestion);
 
         return mapToQuestionDTO(savedHistory);
     }
 
     private void saveAnswerToHistory(Question history, String answer) {
         history.setAnswer(answer);
-        aiConsultationHistoryRepository.save(history);
+        questionRepository.save(history);
     }
 
     private String generatePrompt(Long userId) {
-        List<Question> historyList = aiConsultationHistoryRepository.findByUserId(userId);
+        List<Question> historyList = questionRepository.findByUserId(userId);
         String consultationHistory = promptUtil.extractConsultationHistory(historyList).toString();
 
         return consultationHistory + promptUtil.getPromptPrefix();
@@ -62,11 +63,6 @@ public class CreateNextQuestionFromAnswerUseCase {
         Question newHistory = Question.of(null, userId, questionNumber, newQuestionMessage, null);
         newHistory.incrementQuestionNumber();
         return newHistory;
-    }
-
-    public String removeDataInsideBraces(String input) {
-        // 중괄호와 그 안의 내용을 삭제
-        return input.replaceAll("\\{.*?\\}", "").trim();
     }
 
     private QuestionDTO mapToQuestionDTO(Question history) {

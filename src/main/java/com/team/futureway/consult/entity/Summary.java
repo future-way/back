@@ -35,4 +35,11 @@ public class Summary {
     public static Summary of(Long aiConsultationSummaryHistoryId, Long userId, String summary, String recommend) {
         return new Summary(aiConsultationSummaryHistoryId, userId, summary, recommend, LocalDateTime.now());
     }
+
+    public void removeBracesAndTextFromQuestion(String createdSummary) {
+        if (createdSummary != null) {
+            this.summary = createdSummary.replaceAll("\\{.*?\\}", "").trim();
+        }
+    }
+
 }
