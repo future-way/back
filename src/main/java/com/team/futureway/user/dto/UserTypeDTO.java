@@ -1,4 +1,4 @@
-package com.team.futureway.gemini.dto;
+package com.team.futureway.user.dto;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
