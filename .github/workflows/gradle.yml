@@ -38,10 +38,10 @@ jobs:
         distribution: 'temurin'
 
     - name: Setting secret
-        run: |
-          mkdir -p src/main/resources
-          echo "${{ secrets.APPLICATION_SECRET_YML }}" | base64 --decode > src/main/resources/application-secret.yml
-          find src
+      run: |
+        mkdir -p src/main/resources
+        echo "${{ secrets.APPLICATION_SECRET_YML }}" | base64 --decode > src/main/resources/application-secret.yml
+        find src
         shell: bash
     # Gradle 권한 부여
     - name: Grant permission for gradlew
