@@ -24,7 +24,6 @@ jobs:
         run: ./gradlew build
 
   dependency-submission:
-
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -42,15 +41,18 @@ jobs:
           mkdir -p src/main/resources
           echo "${{ secrets.APPLICATION_SECRET_YML }}" | base64 --decode > src/main/resources/application-secret.yml
           find src
-          shell: bash
+        shell: bash
+
       # Gradle 권한 부여
       - name: Grant permission for gradlew
         run: chmod +x ./gradlew
+
       # Test 없이 빌드
       - name: Build with Gradle
         run: ./gradlew clean build -x test
-      #빌드한 jar 파일을 도커 이미지로 빌드하고 도커 허브에 푸시
-      - name: web docker build and push
+
+      # 빌드한 jar 파일을 도커 이미지로 빌드하고 도커 허브에 푸시
+      - name: Web Docker build and push
         run: |
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
           docker build -t ${{ secrets.DOCKER_REPO }}/future-docker .
