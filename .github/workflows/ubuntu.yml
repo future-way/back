@@ -40,7 +40,7 @@ jobs:
           username: ${{ secrets.NCP_USERNAME }}
           password: ${{ secrets.NCP_PASSWORD }}
           port: ${{ secrets.NCP_PORT }}
-          source: back/*.jar
+          source: build/libs/*.jar
           target: /home
 
   deploy:
