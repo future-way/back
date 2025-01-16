@@ -1,4 +1,4 @@
-## [내일찾기](https://find-your-day.duckdns.org/home) 서비스 소개
+## [내일찾기](https://find-your-day.duckdns.org/home) 서비스 소개 (2024.12.06. ~ 2024.12.15.)
 `내 일 찾기` 는 진로에 대한 고민을 가진 대학생들을 위한 탄생한 AI 기반 진로 탐색 서비스입니다.  
 챗봇 상담을 통해 어디로 가야 할지 막막한 순간 당신의 `내일`과 `일`을 안내 해드립니다.
 
@@ -26,6 +26,7 @@
 - Spring Data JPA
 - Gradle build
 - MariaDB 10.6.18
+
 ## 시스템 설계 문서
 - [ERD](https://github.com/future-way/back/blob/main/docs/erd.md)
 - [Sequence Diagram](https://github.com/future-way/back/blob/main/docs/sequence.md)
