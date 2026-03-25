@@ -2,7 +2,9 @@ package com.team.futureway.consult.controller;
 
 import com.team.futureway.consult.dto.SummaryDTO;
 import com.team.futureway.consult.dto.QuestionDTO;
-import com.team.futureway.consult.response.*;
+import com.team.futureway.consult.request.AnswerRequest;
+import com.team.futureway.consult.response.QuestionResponse;
+import com.team.futureway.consult.response.SummaryResponse;
 import com.team.futureway.consult.service.CreateAndReturnSummaryUseCase;
 import com.team.futureway.consult.service.CreateFirstQuestionUseCase;
 import com.team.futureway.consult.service.CreateNextQuestionFromAnswerUseCase;
@@ -12,10 +14,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "Gemini", description = "Gemini API")
+@Tag(name = "Consult", description = "진로 상담 API")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/gemini")
+@RequestMapping("/api/consults")
 public class ConsultController {
 
     private final CreateFirstQuestionUseCase createFirstQuestionUseCase;
@@ -25,17 +27,17 @@ public class ConsultController {
     private final CreateAndReturnSummaryUseCase createAndReturnSummaryUseCase;
 
     @Operation(summary = "첫 질문 생성")
-    @PostMapping
-    public ResponseEntity<QuestionResponse> firstQuestion(@RequestBody QuestionRequest request) {
-        QuestionDTO result = createFirstQuestionUseCase.execute(request.userId());
+    @PostMapping("/users/{userId}")
+    public ResponseEntity<QuestionResponse> firstQuestion(@PathVariable Long userId) {
+        QuestionDTO result = createFirstQuestionUseCase.execute(userId);
         return ResponseEntity.ok(QuestionResponse.of(result));
     }
 
     @Operation(summary = "답변 저장 및 질문 생성")
-    @PostMapping("/answer")
-    public ResponseEntity<QuestionResponse> question(@RequestBody AnswerRequest request) {
+    @PostMapping("/{questionId}/answers")
+    public ResponseEntity<QuestionResponse> question(@PathVariable Long questionId, @RequestBody AnswerRequest request) {
         QuestionDTO questionDTO = QuestionDTO.of(
-                request.aiConsultationHistoryId(),
+                questionId,
                 request.userId(),
                 0,
                 null,
@@ -47,9 +49,9 @@ public class ConsultController {
     }
 
     @Operation(summary = "상담 내용 요약")
-    @PostMapping("/summary")
-    public ResponseEntity<SummaryResponse> summary(@RequestBody SummaryRequest request) {
-        SummaryDTO result = createAndReturnSummaryUseCase.execute(request.userId());
+    @PostMapping("/users/{userId}/summary")
+    public ResponseEntity<SummaryResponse> summary(@PathVariable Long userId) {
+        SummaryDTO result = createAndReturnSummaryUseCase.execute(userId);
         return ResponseEntity.ok(SummaryResponse.of(result));
     }
 
