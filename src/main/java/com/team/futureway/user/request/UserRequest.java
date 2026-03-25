@@ -1,4 +1,4 @@
-package com.team.futureway.user.response;
+package com.team.futureway.user.request;
 
 public record UserRequest(String name) {
 }
